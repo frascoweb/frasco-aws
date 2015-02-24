@@ -20,16 +20,19 @@ class AwsFeature(Feature):
 
     @action()
     def upload_file_to_s3(self, stream_or_filename, filename, bucket=None, prefix=None,\
-                          acl=None, delete_source=False):
+                          acl=None, mimetype=None, delete_source=False):
         b = self.s3_connection.get_bucket(bucket or self.options['upload_bucket'])
         prefix = prefix or self.options.get('upload_filename_prefix', '')
         k = b.new_key(prefix + filename)
+        acl = acl or self.options['upload_acl']
+        headers = None
+        if mimetype:
+            headers = {'Content-Type': mimetype}
         is_filename = isinstance(stream_or_filename, (str, unicode))
         if is_filename:
-            k.set_contents_from_filename(stream_or_filename)
+            k.set_contents_from_filename(stream_or_filename, headers, policy=acl)
         else:
-            k.set_contents_from_string(stream_or_filename.readlines())
-        k.set_acl(acl or self.options['upload_acl'])
+            k.set_contents_from_string(stream_or_filename.readlines(), headers, policy=acl)
         if is_filename and delete_source:
             os.remove(stream_or_filename)
 

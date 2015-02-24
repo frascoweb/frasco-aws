@@ -10,7 +10,8 @@ class S3StorageBackend(StorageBackend):
         if current_app.features.aws.options['upload_async'] and current_app.features.exists('tasks'):
             tmpname = current_app.features.upload.save_uploaded_file_temporarly(file)
             current_app.features.tasks.enqueue('upload_file_to_s3',
-                stream_or_filename=tmpname, filename=filename, delete_source=True)
+                stream_or_filename=tmpname, filename=filename,
+                mimetype=file.mimetype, delete_source=True)
         else:
             current_app.features.aws.upload_file_to_s3(file, filename)
 
