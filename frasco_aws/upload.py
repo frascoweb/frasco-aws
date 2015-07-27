@@ -24,3 +24,9 @@ class S3StorageBackend(StorageBackend):
                 current_app.features.aws.options['upload_s3_urls_ttl'])
             return k.generate_url(**kwargs)
         return 'https://%s.s3.amazonaws.com/%s' % (bucket, filename)
+
+    def delete(self, filename):
+        if current_app.features.aws.options['upload_async'] and current_app.features.exists('tasks'):
+            current_app.features.tasks.enqueue('delete_s3_file', filename=filename)
+        else:
+            current_app.features.aws.delete_s3_file(filename)
