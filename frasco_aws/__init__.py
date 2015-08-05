@@ -32,7 +32,7 @@ class AwsFeature(Feature):
         if is_filename:
             k.set_contents_from_filename(stream_or_filename, headers, policy=acl)
         else:
-            k.set_contents_from_string(stream_or_filename.readlines(), headers, policy=acl)
+            k.set_contents_from_string(stream_or_filename.read(), headers, policy=acl)
         if is_filename and delete_source:
             os.remove(stream_or_filename)
 
