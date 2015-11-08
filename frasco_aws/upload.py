@@ -11,9 +11,11 @@ class S3StorageBackend(StorageBackend):
             tmpname = current_app.features.upload.save_uploaded_file_temporarly(file)
             current_app.features.tasks.enqueue('upload_file_to_s3',
                 stream_or_filename=tmpname, filename=filename,
-                mimetype=file.mimetype, delete_source=True)
+                mimetype=file.mimetype, delete_source=True,
+                content_disposition_filename=file.filename)
         else:
-            current_app.features.aws.upload_file_to_s3(file, filename)
+            current_app.features.aws.upload_file_to_s3(file, filename,
+                content_disposition_filename=file.filename)
 
     def url_for(self, filename, **kwargs):
         bucket = current_app.features.aws.options['upload_bucket']

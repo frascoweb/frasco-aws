@@ -12,7 +12,8 @@ class AwsFeature(Feature):
                 'upload_acl': 'public-read',
                 'upload_async': False,
                 'upload_signed_url': False,
-                'upload_s3_urls_ttl': 3600}
+                'upload_s3_urls_ttl': 3600,
+                'set_content_dispotion_header_with_filename': True}
 
     @cached_property
     def s3_connection(self):
@@ -20,14 +21,16 @@ class AwsFeature(Feature):
 
     @action()
     def upload_file_to_s3(self, stream_or_filename, filename, bucket=None, prefix=None,\
-                          acl=None, mimetype=None, delete_source=False):
+                          acl=None, mimetype=None, delete_source=False, content_disposition_filename=None):
         b = self.s3_connection.get_bucket(bucket or self.options['upload_bucket'])
         prefix = prefix or self.options.get('upload_filename_prefix', '')
         k = b.new_key(prefix + filename)
         acl = acl or self.options['upload_acl']
-        headers = None
+        headers = {}
+        if self.options['set_content_dispotion_header_with_filename']:
+            headers['Content-Disposition'] = 'attachment;filename=%s' % (content_disposition_filename or filename)
         if mimetype:
-            headers = {'Content-Type': mimetype}
+            headers['Content-Type'] = mimetype
         is_filename = isinstance(stream_or_filename, (str, unicode))
         if is_filename:
             k.set_contents_from_filename(stream_or_filename, headers, policy=acl)
