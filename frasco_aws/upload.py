@@ -6,8 +6,8 @@ from frasco import current_app
 class S3StorageBackend(StorageBackend):
     name = 's3'
 
-    def save(self, file, filename):
-        if current_app.features.aws.options['upload_async'] and current_app.features.exists('tasks'):
+    def save(self, file, filename, force_sync=False):
+        if not force_sync and current_app.features.aws.options['upload_async'] and current_app.features.exists('tasks'):
             tmpname = current_app.features.upload.save_uploaded_file_temporarly(file)
             current_app.features.tasks.enqueue('upload_file_to_s3',
                 stream_or_filename=tmpname, filename=filename,
@@ -27,8 +27,8 @@ class S3StorageBackend(StorageBackend):
             return k.generate_url(**kwargs)
         return 'https://%s.s3.amazonaws.com/%s' % (bucket, filename)
 
-    def delete(self, filename):
-        if current_app.features.aws.options['upload_async'] and current_app.features.exists('tasks'):
+    def delete(self, filename, force_sync=False):
+        if not force_sync and current_app.features.aws.options['upload_async'] and current_app.features.exists('tasks'):
             current_app.features.tasks.enqueue('delete_s3_file', filename=filename)
         else:
             current_app.features.aws.delete_s3_file(filename)
