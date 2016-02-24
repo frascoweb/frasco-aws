@@ -8,7 +8,7 @@ class S3StorageBackend(StorageBackend):
 
     def save(self, file, filename, force_sync=False):
         if not force_sync and current_app.features.aws.options['upload_async'] and current_app.features.exists('tasks'):
-            tmpname = current_app.features.upload.save_uploaded_file_temporarly(file)
+            tmpname = current_app.features.upload.save_uploaded_file_temporarly(file, filename)
             current_app.features.tasks.enqueue('upload_file_to_s3',
                 stream_or_filename=tmpname, filename=filename,
                 mimetype=file.mimetype, delete_source=True,
