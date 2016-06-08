@@ -28,7 +28,7 @@ class AwsFeature(Feature):
         acl = acl or self.options['upload_acl']
         headers = {}
         if self.options['set_content_dispotion_header_with_filename']:
-            headers['Content-Disposition'] = 'attachment;filename=%s' % (content_disposition_filename or filename)
+            headers['Content-Disposition'] = 'attachment;filename="%s"' % (content_disposition_filename or filename)
         if mimetype:
             headers['Content-Type'] = mimetype
         is_filename = isinstance(stream_or_filename, (str, unicode))
