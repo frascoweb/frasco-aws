@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='frasco-aws',
-    version='0.2',
+    version='0.2.2',
     url='http://github.com/frascoweb/frasco-aws',
     license='MIT',
     author='Maxime Bouroumeau-Fuseau',
